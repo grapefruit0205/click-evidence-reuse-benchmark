@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      target_repository:
+        description: Public GitHub repository to evaluate (OWNER/REPO)
+        required: true
+        default: grapefruit0205/click
+      target_ref:
+        description: Branch, tag, or commit to evaluate
+        required: true
+        default: bb43dc07a82aad3b9b4be76f5ad85239684393a1
+
+permissions:
+  contents: read
+
+jobs:
+  portability:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      CLICK_BENCH_TARGET_REPOSITORY: ${{ inputs.target_repository || 'grapefruit0205/click' }}
+      CLICK_BENCH_TARGET_REF: ${{ inputs.target_ref || 'bb43dc07a82aad3b9b4be76f5ad85239684393a1' }}
+    steps:
+      - name: Check out benchmark
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.11"
+      - name: Compile benchmark sources
+        run: python -m compileall -q benchmarks tests
+      - name: Run benchmark regression tests
+        run: python scripts/run_benchmark.py --tests
+
+  full-matrix:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    env:
+      CLICK_BENCH_TARGET_REPOSITORY: ${{ inputs.target_repository || 'grapefruit0205/click' }}
+      CLICK_BENCH_TARGET_REF: ${{ inputs.target_ref || 'bb43dc07a82aad3b9b4be76f5ad85239684393a1' }}
+    steps:
+      - name: Check out benchmark
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: "3.11"
+      - name: Run all 500 controlled cases
+        run: python scripts/run_benchmark.py -- --fail-on-unsafe
