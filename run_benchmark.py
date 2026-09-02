@@ -89,6 +89,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         action="store_true",
         help="run benchmark regression tests instead of the full matrix",
     )
+    parser.add_argument(
+        "--suite",
+        choices=(
+            "evidence-reuse-500",
+            "dependency-omission-100",
+            "unnecessary-rerun-100",
+        ),
+        default="evidence-reuse-500",
+        help="benchmark suite to run",
+    )
     arguments, benchmark_args = parser.parse_known_args(argv)
     if benchmark_args[:1] == ["--"]:
         benchmark_args = benchmark_args[1:]
@@ -128,11 +138,16 @@ def main(argv: Sequence[str] | None = None) -> int:
         environment = os.environ.copy()
         environment["CLICK_REPO"] = str(target)
         environment["CLICK_TARGET_LOCK"] = str(runtime_lock)
-        command = (
-            [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v"]
-            if arguments.tests
-            else [sys.executable, "-m", "benchmarks.evidence_reuse", *benchmark_args]
-        )
+        if arguments.tests:
+            command = [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v"]
+        else:
+            modules = {
+                "evidence-reuse-500": "benchmarks.evidence_reuse",
+                "dependency-omission-100": "benchmarks.dependency_omission",
+                "unnecessary-rerun-100": "benchmarks.unnecessary_rerun",
+            }
+            module = modules[arguments.suite]
+            command = [sys.executable, "-m", module, *benchmark_args]
         completed = subprocess.run(command, cwd=ROOT, env=environment, check=False)
         return completed.returncode
 
