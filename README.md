@@ -4,10 +4,11 @@ An independent, deterministic benchmark for
 [Click](https://github.com/grapefruit0205/click) cross-revision verification
 evidence reuse.
 
-It contains two separately runnable suites:
+It contains three separately runnable suites:
 
 - a 500-cell evidence-reuse matrix; and
-- a 100-case black-box dependency-omission suite.
+- a 100-case black-box dependency-omission suite; and
+- a 100-case black-box unnecessary-rerun suite.
 
 The suite asks one question: after a repository or environment changes, is it
 safe to trust an earlier verification result? It does not call an LLM. It runs
@@ -81,6 +82,34 @@ and 100/100 actual rerun failures. This means Click caught every controlled
 omission tested here; it does not prove that a production observer can see every
 dependency in every real repository.
 
+## The independent 100-case unnecessary-rerun suite
+
+This safe-change suite measures the opposite failure mode: Click rerunning a
+check even though old evidence is still valid. Its generator also does not
+import Click rules.
+
+Each case first obtains a complete dependency list from a real fixture process.
+It then changes a tracked documentation, unused example, unread asset, tooling
+note, or unrelated source file that is absent from that observation. Click's
+decision and a real passing rerun are recorded separately. The suite includes
+exact manifests and broad repository, runtime, mixed, and language envelopes.
+
+Python, Node.js, C, and Java each receive 25 cases with the fixed default seed
+`20260903`. Run only these 100 safe-change cases with:
+
+```text
+# Linux or macOS
+python3 run_benchmark.py --suite unnecessary-rerun-100 -- --fail-on-unnecessary-rerun --fail-on-oracle-mismatch
+
+# Windows
+py -3 run_benchmark.py --suite unnecessary-rerun-100 -- --fail-on-unnecessary-rerun --fail-on-oracle-mismatch
+```
+
+The initial pinned result is 100/100 correct safe reuses, zero unnecessary
+reruns, and 100/100 actual rerun passes. This measures cache efficiency only for
+the controlled safe changes in this suite; it does not replace the separate
+dependency-omission safety result.
+
 ## The 500-case matrix
 
 The suite crosses 100 semantic mutations with five manifest states:
@@ -131,9 +160,10 @@ imported and executed, so only evaluate code you trust.
 
 Anyone can also fork this benchmark repository and use **Actions → CI → Run
 workflow** to enter a target repository and branch, tag, or commit and choose
-either suite or both. The public job runs portability checks on Linux, macOS,
-and Windows. A normal main-branch push runs the 100 omission cases; the older
-500-cell matrix runs only when explicitly selected in the manual workflow.
+a suite or a suite group. The public job runs portability checks on Linux,
+macOS, and Windows. A normal main-branch push runs both independent 100-case
+suites; the older 500-cell matrix runs only when explicitly selected in the
+manual workflow.
 
 Python, Node.js, GCC, and a JDK are required. When a local JDK is unavailable,
 the runner can use its digest-pinned, network-disabled Temurin container; it

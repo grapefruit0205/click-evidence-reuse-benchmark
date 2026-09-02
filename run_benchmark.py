@@ -91,7 +91,11 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     parser.add_argument(
         "--suite",
-        choices=("evidence-reuse-500", "dependency-omission-100"),
+        choices=(
+            "evidence-reuse-500",
+            "dependency-omission-100",
+            "unnecessary-rerun-100",
+        ),
         default="evidence-reuse-500",
         help="benchmark suite to run",
     )
@@ -137,11 +141,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         if arguments.tests:
             command = [sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v"]
         else:
-            module = (
-                "benchmarks.dependency_omission"
-                if arguments.suite == "dependency-omission-100"
-                else "benchmarks.evidence_reuse"
-            )
+            modules = {
+                "evidence-reuse-500": "benchmarks.evidence_reuse",
+                "dependency-omission-100": "benchmarks.dependency_omission",
+                "unnecessary-rerun-100": "benchmarks.unnecessary_rerun",
+            }
+            module = modules[arguments.suite]
             command = [sys.executable, "-m", module, *benchmark_args]
         completed = subprocess.run(command, cwd=ROOT, env=environment, check=False)
         return completed.returncode
