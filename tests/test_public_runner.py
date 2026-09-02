@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from scripts.run_benchmark import normalize_repository, validate_ref
+from run_benchmark import normalize_repository, validate_ref
 
 
 class PublicRunnerTests(unittest.TestCase):
@@ -27,4 +27,3 @@ class PublicRunnerTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

@@ -36,9 +36,9 @@ jobs:
         with:
           python-version: "3.11"
       - name: Compile benchmark sources
-        run: python -m compileall -q benchmarks tests
+        run: python -m compileall -q benchmarks tests run_benchmark.py
       - name: Run benchmark regression tests
-        run: python scripts/run_benchmark.py --tests
+        run: python run_benchmark.py --tests
 
   full-matrix:
     if: github.event_name != 'pull_request'
@@ -54,4 +54,4 @@ jobs:
         with:
           python-version: "3.11"
       - name: Run all 500 controlled cases
-        run: python scripts/run_benchmark.py -- --fail-on-unsafe
+        run: python run_benchmark.py -- --fail-on-unsafe

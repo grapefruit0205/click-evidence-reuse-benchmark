@@ -63,16 +63,16 @@ the repository as a ZIP also works.
 
 ```text
 # Linux or macOS
-python3 scripts/run_benchmark.py -- --fail-on-unsafe
+python3 run_benchmark.py -- --fail-on-unsafe
 
 # Windows
-py -3 scripts/run_benchmark.py -- --fail-on-unsafe
+py -3 run_benchmark.py -- --fail-on-unsafe
 ```
 
 To evaluate a public fork or another Click-compatible repository:
 
 ```text
-python3 scripts/run_benchmark.py \
+python3 run_benchmark.py \
   --target-repository OWNER/REPO \
   --target-ref BRANCH_OR_COMMIT \
   -- --fail-on-unsafe
@@ -94,9 +94,9 @@ never pulls the image implicitly.
 Focused runs and JSON output are also available:
 
 ```text
-python3 scripts/run_benchmark.py -- --manifest exact
-python3 scripts/run_benchmark.py -- --profile c-native
-python3 scripts/run_benchmark.py -- --json
+python3 run_benchmark.py -- --manifest exact
+python3 run_benchmark.py -- --profile c-native
+python3 run_benchmark.py -- --json
 ```
 
 ## Reading the report

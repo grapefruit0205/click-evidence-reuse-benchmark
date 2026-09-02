@@ -1,2 +1,0 @@
-"""Public benchmark helper scripts."""
-

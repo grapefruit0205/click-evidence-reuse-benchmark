@@ -13,7 +13,7 @@ import tempfile
 from typing import Any, Sequence
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parent
 DEFAULT_LOCK = ROOT / "target.lock.json"
 GITHUB_REPOSITORY = re.compile(
     r"(?:https://github\.com/)?([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+?)(?:\.git)?"
